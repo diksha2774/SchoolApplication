@@ -27,9 +27,13 @@ router.post('/addSchool', (req, res) => {
 
     const sql = 'INSERT INTO schools (name, address, latitude, longitude) VALUES (?, ?, ?, ?)';
     db.query(sql, [name, address, latitude, longitude], (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.error(err); // Log the error for debugging purposes
+            return res.status(500).json({ error: 'Database error occurred' });
+        }
         res.status(201).json({ message: 'School added successfully in the DB...!', schoolId: result.insertId });
     });
+    
 });
 
 router.get('/listSchools', (req, res) => {
@@ -41,7 +45,10 @@ router.get('/listSchools', (req, res) => {
 
     const sql = 'SELECT * FROM schools';
     db.query(sql, (err, results) => {
-        if (err) throw err;
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to retrieve schools from the database' });
+        }
 
         results.forEach(school => {
             school.distance = Distance(
